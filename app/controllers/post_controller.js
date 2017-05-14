@@ -4,7 +4,7 @@
  // and we purposefully don't return content here either
  const cleanPosts = (posts) => {
    return posts.map((post) => {
-     return { id: post._id, title: post.title, tags: post.tags, cover_url: post.cover_url };
+     return { id: post._id, author: post.author, title: post.title, tags: post.tags, cover_url: post.cover_url };
    });
  };
 
@@ -14,6 +14,7 @@
    post.content = req.body.content;
    post.tags = req.body.tags;
    post.cover_url = req.body.cover_url;
+   post.author = req.user._id; // user.id
    post.save()
    .then((result) => {
      res.json({ message: 'Post created!' });
@@ -24,9 +25,16 @@
  };
 
  export const getPosts = (req, res) => {
-   Post.find({}, (err, data) => {
-     res.send(cleanPosts(data));
-   });
+   Post
+    .find({})
+      .populate('author')
+      .exec((err, data) => {
+        if (err) {
+          console.log(err);
+        }
+        console.log(data);
+        res.send(cleanPosts(data));
+      });
  };
 
  export const getPost = (req, res) => {

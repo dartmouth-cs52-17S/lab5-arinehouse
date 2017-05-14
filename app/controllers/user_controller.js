@@ -11,26 +11,30 @@ export const signin = (req, res, next) => {
 export const signup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
+  const username = req.body.username;
 
-  if (!email || !password) {
-    res.status(422).send('You must provide an email and password');
+  if (!email || !password || !username) {
+    res.status(422).send('You must provide an email, password, and username');
+    return;
   }
 
   // Check if the email already exists in the system
-  User.find({ email }, (err, data) => {
-    if (data == null) {
+  User.findOne({ email }, (err, data) => {
+    if (err) {
+      res.status(500).json({ err });
+      return;
+    } else if (data) {
       res.status(409).send('This email address is already registered');
-    } else {
-      res.sendStatus(200);
+      return;
     }
     // If not, create a new user
     const user = new User();
     user.email = email;
     user.password = password;
+    user.username = username;
     user.save()
     .then((result) => {
       res.send({ token: tokenForUser(user) });
-      res.json({ message: 'Post created!' });
     })
     .catch((error) => {
       res.status(500).json({ error });

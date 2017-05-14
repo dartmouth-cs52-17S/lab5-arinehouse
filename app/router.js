@@ -12,6 +12,9 @@ router.get('/', (req, res) => {
 
 // your routes will go here
 
+router.post('/signin', requireSignin, UserController.signin);
+router.post('/signup', UserController.signup);
+
 router.route('/posts')
   .post(requireAuth, Posts.createPost)
   .get((req, res) => {
@@ -24,9 +27,5 @@ router.route('/posts/:id')
   })
   .put(requireAuth, Posts.updatePost)
   .delete(requireAuth, Posts.deletePost);
-
-router.post('/signin', requireSignin, UserController.signin);
-
-router.post('/signup', UserController.signup);
 
 export default router;

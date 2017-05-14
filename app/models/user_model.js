@@ -5,13 +5,14 @@ import bcrypt from 'bcryptjs';
 const UserSchema = new Schema({
   email: { type: String, unique: true, lowercase: true },
   password: String,
+  username: String,
 });
 
 UserSchema.set('toJSON', {
   virtuals: true,
 });
 
-UserSchema.pre('save', (next) => {
+UserSchema.pre('save', function beforeUserSave(next) {
   const user = this;
   if (!user.isModified('password')) {
     return next();
@@ -19,17 +20,16 @@ UserSchema.pre('save', (next) => {
   bcrypt.genSalt(10, (err, salt) => {
     bcrypt.hash(user.password, salt, (err, hash) => {
       user.password = hash;
-      return next();
+      next();
     });
   });
-  return next();
 });
 
 // Adapted from http://stackoverflow.com/questions/14588032/mongoose-password-hashing
 UserSchema.methods.comparePassword = function comparePassword(candidatePassword, callback) {
   bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
     if (err) return callback(err);
-    else return callback(null, isMatch);
+    return callback(null, isMatch);
   });
 };
 
