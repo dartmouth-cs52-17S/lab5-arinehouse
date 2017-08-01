@@ -17,6 +17,18 @@ const app = express();
 // enable/disable cross origin resource sharing if necessary
 app.use(cors());
 
+const setCustomHeaderFunc = (req, res, next) => {
+  if (process.env.LOCAL) {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
+  } else {
+    res.header('Access-Control-Allow-Origin', 'http://redux-blog.surge.sh');
+  }
+  res.header('Access-Control-Allow-Credentials', true);
+  next();
+};
+
+app.all('*', setCustomHeaderFunc);
+
 app.set('view engine', 'ejs');
 app.use(express.static('static'));
 // enables static assets from folder static
