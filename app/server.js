@@ -18,7 +18,7 @@ const app = express();
 app.use(cors());
 
 const setCustomHeaderFunc = (req, res, next) => {
-  if (process.env.LOCAL) {
+  if (process.env.LOCAL === true) {
     res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
   } else {
     res.header('Access-Control-Allow-Origin', 'http://redux-blog.surge.sh');
